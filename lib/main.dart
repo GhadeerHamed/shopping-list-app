@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_list/widgets/grocery_list.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,60 +21,7 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: const Color.fromARGB(255, 50, 58, 60),
       ),
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Groceries')),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.local_grocery_store),
-                SizedBox(width: 10),
-                Text(
-                  'Welcome to Flutter Groceries!',
-                  style: TextStyle(fontSize: 24),
-                ),
-              ],
-            ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.local_grocery_store),
-                SizedBox(width: 10),
-                Text(
-                  'Welcome to Flutter Groceries!',
-                  style: TextStyle(fontSize: 24),
-                ),
-              ],
-            ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.local_grocery_store),
-                SizedBox(width: 10),
-                Text(
-                  'Welcome to Flutter Groceries!',
-                  style: TextStyle(fontSize: 24),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+      home: const GroceryList(),
     );
   }
 }
