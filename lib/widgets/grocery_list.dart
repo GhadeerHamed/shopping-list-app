@@ -32,7 +32,7 @@ class _GroceryListState extends State<GroceryList> {
     final response = await http.get(url);
     final Map<String, dynamic> data = json.decode(response.body);
 
-    final List<GroceryItem> _loadedItems = [];
+    final List<GroceryItem> loadedItems = [];
     for (final item in data.entries) {
       final category = categories.entries
           .firstWhere(
@@ -42,7 +42,7 @@ class _GroceryListState extends State<GroceryList> {
           )
           .value;
 
-      _loadedItems.add(
+      loadedItems.add(
         GroceryItem(
           id: item.key,
           name: item.value['name'],
@@ -53,19 +53,25 @@ class _GroceryListState extends State<GroceryList> {
     }
 
     setState(() {
-      _groceryItems = _loadedItems;
+      _groceryItems = loadedItems;
     });
   }
 
   void _addItem() async {
     // Navigate to the NewItem screen
-    await Navigator.of(context).push<GroceryItem>(
+    final newItem = await Navigator.of(context).push<GroceryItem>(
       MaterialPageRoute(
         builder: (ctx) => const NewItem(),
       ),
     );
 
-    _loadItems();
+    if (newItem == null) {
+      return;
+    }
+
+    setState(() {
+      _groceryItems.add(newItem);
+    });
   }
 
   @override
