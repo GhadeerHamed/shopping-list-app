@@ -15,6 +15,7 @@ class NewItem extends StatefulWidget {
 
 class _NewItemState extends State<NewItem> {
   final _formKey = GlobalKey<FormState>();
+  var _isSending = false;
 
   late String _enteredName;
   int _enteredQuantity = 1;
@@ -23,6 +24,10 @@ class _NewItemState extends State<NewItem> {
   void _saveItem() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      setState(() {
+        _isSending = true;
+      });
 
       final url = Uri.https(
         'faker-app-flutter-fireba-72e85-default-rtdb.firebaseio.com',
@@ -134,15 +139,25 @@ class _NewItemState extends State<NewItem> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () {
-                      _formKey.currentState!.reset();
-                    },
+                    onPressed: _isSending
+                        ? null
+                        : () {
+                            _formKey.currentState!.reset();
+                          },
                     child: const Text('Reset'),
                   ),
                   SizedBox(width: 16),
                   ElevatedButton(
-                    onPressed: _saveItem,
-                    child: const Text('Add Item'),
+                    onPressed: _isSending ? null : _saveItem,
+                    child: _isSending
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text('Add Item'),
                   ),
                 ],
               ),
