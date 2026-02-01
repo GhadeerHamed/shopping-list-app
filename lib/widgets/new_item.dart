@@ -16,12 +16,13 @@ class NewItem extends StatefulWidget {
 class _NewItemState extends State<NewItem> {
   final _formKey = GlobalKey<FormState>();
   var _isSending = false;
+  String? _error;
 
   late String _enteredName;
   int _enteredQuantity = 1;
   var _selectedCategory = categories[Categories.vegetables]!;
 
-  void _saveItem() {
+  void _saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -34,32 +35,37 @@ class _NewItemState extends State<NewItem> {
         '/grocery-items.json',
       );
 
-      http
-          .post(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: json.encode({
-              'name': _enteredName,
-              'quantity': _enteredQuantity,
-              'category': _selectedCategory.title,
-            }),
-          )
-          .then((response) {
-            final responseData = json.decode(response.body);
+      try {
+        var response = await http.post(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: json.encode({
+            'name': _enteredName,
+            'quantity': _enteredQuantity,
+            'category': _selectedCategory.title,
+          }),
+        );
 
-            if (!context.mounted) return;
+        final responseData = json.decode(response.body);
 
-            Navigator.of(context).pop(
-              GroceryItem(
-                id: responseData['name'],
-                name: _enteredName,
-                quantity: _enteredQuantity,
-                category: _selectedCategory,
-              ),
-            );
-          });
+        if (!context.mounted) return;
+
+        Navigator.of(context).pop(
+          GroceryItem(
+            id: responseData['name'],
+            name: _enteredName,
+            quantity: _enteredQuantity,
+            category: _selectedCategory,
+          ),
+        );
+      } catch (e) {
+        setState(() {
+          _isSending = false;
+          _error = 'Failed to save item. Please try again.';
+        });
+      }
     }
   }
 
@@ -134,6 +140,17 @@ class _NewItemState extends State<NewItem> {
                   ),
                 ],
               ),
+              _error != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text(
+                        _error!,
+                        style: const TextStyle(
+                          color: Colors.red,
+                        ),
+                      ),
+                    )
+                  : const SizedBox(),
               SizedBox(height: 32),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
