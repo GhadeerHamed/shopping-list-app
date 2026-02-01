@@ -29,26 +29,32 @@ class _NewItemState extends State<NewItem> {
         '/grocery-items.json',
       );
 
-      http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({
-          'name': _enteredName,
-          'quantity': _enteredQuantity,
-          'category': _selectedCategory.title,
-        }),
-      );
+      http
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: json.encode({
+              'name': _enteredName,
+              'quantity': _enteredQuantity,
+              'category': _selectedCategory.title,
+            }),
+          )
+          .then((response) {
+            final responseData = json.decode(response.body);
 
-      // Navigator.of(context).pop(
-      //   GroceryItem(
-      //     id: DateTime.now().toString(),
-      //     name: _enteredName,
-      //     quantity: _enteredQuantity,
-      //     category: _selectedCategory,
-      //   ),
-      // );
+            if (!context.mounted) return;
+
+            Navigator.of(context).pop(
+              GroceryItem(
+                id: responseData['name'],
+                name: _enteredName,
+                quantity: _enteredQuantity,
+                category: _selectedCategory,
+              ),
+            );
+          });
     }
   }
 
