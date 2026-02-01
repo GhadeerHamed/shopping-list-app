@@ -86,6 +86,45 @@ class _GroceryListState extends State<GroceryList> {
     });
   }
 
+  void _removeItem(GroceryItem item) async {
+    var index = _groceryItems.indexOf(item);
+    setState(() {
+      _groceryItems.remove(item);
+    });
+
+    final url = Uri.https(
+      'faker-app-flutter-fireba-72e85-default-rtdb.firebaseio.com',
+      '/grocery-items/${item.id}.json',
+    );
+
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      setState(() {
+        _groceryItems.insert(index, item);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Failed to delete the item. Please try again.',
+            style: TextStyle(color: Colors.red),
+          ),
+        ),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Item deleted successfully.',
+          style: TextStyle(color: Colors.green),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget content = const Center(
@@ -107,9 +146,7 @@ class _GroceryListState extends State<GroceryList> {
         itemBuilder: (ctx, index) => Dismissible(
           key: ValueKey(_groceryItems[index].id),
           onDismissed: (direction) {
-            setState(() {
-              _groceryItems.removeAt(index);
-            });
+            _removeItem(_groceryItems[index]);
           },
           background: Container(
             color: Theme.of(context).colorScheme.error.withValues(alpha: 0.75),
